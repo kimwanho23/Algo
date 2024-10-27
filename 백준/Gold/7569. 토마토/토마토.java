@@ -13,88 +13,81 @@ class ToPoint {
     }
 }
 
-
 public class Main {
     static int[][][] box;
     static int M, N, H;
-    static boolean[][][] visited;
-    static int[][][] result;
-    static List<ToPoint> begin;
-    static int sum = 0;
+    static int unripeTomatoes = 0;
 
-    static int[] dx = {-1, 1, 0, 0, 0 ,0};
-    static int[] dy = {0, 0, 1 ,-1, 0, 0};
+    static int[] dx = {-1, 1, 0, 0, 0, 0};
+    static int[] dy = {0, 0, 1, -1, 0, 0};
     static int[] dz = {0, 0, 0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        StringTokenizer st;
-        st = new StringTokenizer(br.readLine());
-
-        M = Integer.parseInt(st.nextToken()); // 5
-        N = Integer.parseInt(st.nextToken()); // 3
-        H = Integer.parseInt(st.nextToken()); // 1
-
+        M = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        H = Integer.parseInt(st.nextToken());
 
         box = new int[H][N][M];
-        visited = new boolean[H][N][M];
-        result = new int[H][N][M];
-        begin = new LinkedList<>();
+        ArrayDeque<ToPoint> q = new ArrayDeque<>();
 
-        for(int i = 0; i < H; i++){
-            for(int j = 0; j < N; j++){
+        for (int i = 0; i < H; i++) {
+            for (int j = 0; j < N; j++) {
                 st = new StringTokenizer(br.readLine());
-                for(int k = 0; k < M; k++){
+                for (int k = 0; k < M; k++) {
                     box[i][j][k] = Integer.parseInt(st.nextToken());
-                    if (box[i][j][k] == 1){
-                        begin.add(new ToPoint(i, j ,k));
-                        visited[i][j][k] = true;
-                    }
-                    result[i][j][k] = 0;
-                }
-            }
-        }
-        BFS();
-
-        for(int i = 0; i < H; i++){
-            for(int j = 0; j < N; j++){
-                for(int k = 0; k < M; k++){
-                    if (box[i][j][k] == 0 && !visited[i][j][k]){
-                        System.out.println(-1);
-                        return;
+                    if (box[i][j][k] == 1) {
+                        q.add(new ToPoint(i, j, k));  // 익은 토마토 큐에 추가
+                    } else if (box[i][j][k] == 0) {
+                        unripeTomatoes++;  // 익지 않은 토마토 수 카운팅
                     }
                 }
             }
         }
-        System.out.println(sum);
 
+        int days = BFS(q);
+
+        // 모든 토마토가 익지 못한 경우 -1 반환
+        if (unripeTomatoes > 0) {
+            System.out.println(-1);
+        } else {
+            System.out.println(days);
+        }
     }
-    static void BFS(){
-        Queue<ToPoint> q = new LinkedList<>(begin);
-        while (!q.isEmpty()){
-            ToPoint tp = q.poll();
-            int count  = result[tp.x][tp.y][tp.z];
-            for (int i = 0; i < 6; i++) {
-                int nextX = tp.x + dx[i];
-                int nextY = tp.y + dy[i];
-                int nextZ = tp.z + dz[i];
 
-                if (nextX < 0 || nextY < 0 || nextZ < 0 || nextX >= H || nextY >= N || nextZ >= M)
-                    continue;
-                if (visited[nextX][nextY][nextZ])
-                    continue;
-                if (box[nextX][nextY][nextZ] == -1)
-                    continue;
+    static int BFS(ArrayDeque<ToPoint> q) {
+        int days = -1;  // 첫날 초기화로 -1 시작 (큐에서 첫 레벨 때 증가)
+        
+        while (!q.isEmpty()) {
+            int size = q.size();
+            days++;
+            
+            for (int i = 0; i < size; i++) {
+                ToPoint tp = q.poll();
 
+                for (int j = 0; j < 6; j++) {
+                    int nextX = tp.x + dx[j];
+                    int nextY = tp.y + dy[j];
+                    int nextZ = tp.z + dz[j];
 
-                result[nextX][nextY][nextZ] = count + 1;
-                visited[nextX][nextY][nextZ] = true;
-                sum = Math.max(result[nextX][nextY][nextZ], sum);
+                    if (nextX < 0 || nextY < 0 || nextZ < 0 || nextX >= H || nextY >= N || nextZ >= M)
+                        continue;
+                    if (box[nextX][nextY][nextZ] != 0)
+                        continue;
 
+                    box[nextX][nextY][nextZ] = 1;  // 방문 처리하여 익음 표시
+                    q.add(new ToPoint(nextX, nextY, nextZ));
+                    unripeTomatoes--;  // 익지 않은 토마토 수 감소
 
-                q.add(new ToPoint(nextX, nextY, nextZ));
+                    // 모든 토마토가 익었을 경우 조기 종료
+                    if (unripeTomatoes == 0) {
+                        return days + 1;
+                    }
+                }
             }
         }
+        return days;
     }
 }
