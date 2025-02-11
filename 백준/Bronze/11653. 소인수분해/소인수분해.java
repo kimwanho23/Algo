@@ -8,16 +8,21 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         int N = Integer.parseInt(br.readLine());
 
-        int index = 2;
-        while (N != 1) {
-            if (N % index == 0) {
-                sb.append(index).append("\n");
-                N = N / index;
-                index = 2;
-            } else {
-                index++;
+        while (N % 2 == 0) {
+            sb.append(2).append("\n");
+            N /= 2;
+        }
+        for (int i = 3; i * i <= N; i += 2) {
+            while (N % i == 0) {
+                sb.append(i).append("\n");
+                N /= i;
             }
         }
+
+        if (N > 1) {
+            sb.append(N).append("\n");
+        }
+
         System.out.println(sb);
     }
 }
