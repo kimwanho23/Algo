@@ -3,59 +3,34 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-public class Main{
-    static int[] arr;
+public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken()); //
-        int S = Integer.parseInt(st.nextToken()); // 부분합 크기 s 이상
 
-        int min = Integer.MAX_VALUE;
+        int N = Integer.parseInt(st.nextToken());
+        int S = Integer.parseInt(st.nextToken());
 
-        arr = new int[N];
-
+        int[] arr = new int[N];
         st = new StringTokenizer(br.readLine());
+
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        int end = 0; // end 0부터.
-        int current = arr[0]; // 처음 숫자
-        int length = 1; // 기본값
+        int start = 0, end = 0;
+        int current = 0, min = Integer.MAX_VALUE;
 
-        if (current >= S) { // 초기값에서 끝날 때는 1
-            System.out.println(1);
-            return;
-        }
-
-        for (int start = 0; start < N; start++) {
-            if (current >= S) {
-                current -= arr[start - 1];
-                length--;
-                if (current >= S) {
-                    min = Math.min(min, length);
-                }
-            }
-
+        while (end < N) {
             while (end < N && current < S) {
-                end++; // end 값 증가
-                if (end == N) break;
-                current += arr[end]; // 현재 값에서 arr[end] 증가
-                length++;
-                if (current >= S) {
-                    min = Math.min(length, min);
-                }
+                current += arr[end++];
             }
-
-
-        }
-        if (min == Integer.MAX_VALUE) {
-            System.out.println(0);
-        } else {
-            System.out.println(min);
+            while (current >= S) {
+                min = Math.min(min, end - start);
+                current -= arr[start++];
+            }
         }
 
+        System.out.println(min == Integer.MAX_VALUE ? 0 : min);
     }
 }
