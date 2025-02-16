@@ -1,26 +1,19 @@
-
 import java.util.Stack;
+
 
 class Solution
 {
-    public static int solution(String s)
-    {
-        int answer = 1;
+    public static int solution(String s) {
         Stack<Character> stack = new Stack<>();
 
-        for (int i = 0; i < s.length(); i++) {
-            if (stack.isEmpty() || stack.peek() != s.charAt(i)) {
-               stack.add(s.charAt(i));
+        for (char c : s.toCharArray()) {
+            if (!stack.isEmpty() && stack.peek() == c) {
+                stack.pop(); // 스택의 top과 현재 문자가 같다면 pop
             } else {
-                char s1 = stack.peek();
-                if (s.charAt(i) == s1) {
-                    stack.pop();
-                }
+                stack.push(c); // 그렇지 않다면 push
             }
         }
-        if (!stack.isEmpty()) {
-            return 0;
-        }
-        return answer;
+
+        return stack.isEmpty() ? 1 : 0;
     }
 }
