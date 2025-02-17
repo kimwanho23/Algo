@@ -10,14 +10,13 @@ class Solution {
             map.put(key, map.getOrDefault(key, 0) + 1);
         }
 
-        List<Integer> keySet = new ArrayList<>(map.values());
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        pq.addAll(map.values());
 
-        keySet.sort(Collections.reverseOrder());
-
-        for (Integer integer : keySet) {
-            current += integer;
+        while (!pq.isEmpty()) {
+            current += pq.poll();
             answer++;
-            if (k <= current) break;
+            if (current >= k) break;
         }
 
         return answer;
